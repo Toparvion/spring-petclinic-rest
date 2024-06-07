@@ -16,20 +16,23 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.mapper.PetMapper;
+import org.springframework.samples.petclinic.mapper.VisitMapper;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.rest.api.PetsApi;
 import org.springframework.samples.petclinic.rest.dto.PetDto;
+import org.springframework.samples.petclinic.rest.dto.VisitDto;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.samples.petclinic.service.DiseaseRiskAi;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Vitaliy Fedoriv
@@ -44,9 +47,15 @@ public class PetRestController implements PetsApi {
 
     private final PetMapper petMapper;
 
-    public PetRestController(ClinicService clinicService, PetMapper petMapper) {
+    private final VisitMapper visitMapper;
+
+    private final DiseaseRiskAi diseaseRiskAi;
+
+    public PetRestController(ClinicService clinicService, PetMapper petMapper, VisitMapper visitMapper, DiseaseRiskAi diseaseRiskAi) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
+        this.visitMapper = visitMapper;
+        this.diseaseRiskAi = diseaseRiskAi;
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -69,8 +78,17 @@ public class PetRestController implements PetsApi {
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
+	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+    @Override
+	public ResponseEntity<List<VisitDto>> listRecommendedVisits(Integer petId) {
+        List<VisitDto> visits = new ArrayList<>(visitMapper.toVisitsDto(diseaseRiskAi.fetchRecommendedVisits(petId)));
+        if (visits.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(visits);
+	}
 
-    @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
     public ResponseEntity<PetDto> updatePet(Integer petId, PetDto petDto) {
         Pet currentPet = this.clinicService.findPetById(petId);
