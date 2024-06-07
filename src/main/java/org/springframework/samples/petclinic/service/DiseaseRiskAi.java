@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.random.RandomGeneratorFactory;
 
@@ -11,13 +12,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.Visit;
+import org.springframework.samples.petclinic.repository.OwnerRepository;
 import org.springframework.samples.petclinic.repository.PetRepository;
+import org.springframework.samples.petclinic.service.care.OwnerCareTask;
+import org.springframework.samples.petclinic.util.ThreadUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.joining;
 
 /**
  *
@@ -28,6 +35,7 @@ public class DiseaseRiskAi {
     private static final Logger log = LoggerFactory.getLogger(DiseaseRiskAi.class);
 
     private final PetRepository petRepository;
+    private final OwnerRepository ownerRepository;
 
     /**
      * A lock to prevent inconsistency of data derived from the risks. Any number of threads can read the risks
@@ -42,9 +50,13 @@ public class DiseaseRiskAi {
      */
     private final Map<Integer, List<Visit>> visitCache = new ConcurrentHashMap<>();
 
+    private final ExecutorService careThreadPool;
+
     @Autowired
-    public DiseaseRiskAi(PetRepository petRepository) {
+    public DiseaseRiskAi(PetRepository petRepository, OwnerRepository ownerRepository, ExecutorService careThreadPool) {
         this.petRepository = petRepository;
+        this.ownerRepository = ownerRepository;
+        this.careThreadPool = careThreadPool;
     }
 
     public List<Visit> fetchRecommendedVisits(int petId) {
@@ -98,7 +110,22 @@ public class DiseaseRiskAi {
         finally {
             visitCache.clear();   // don't forget to reset previously recommended visits as they might become obsolete
         }
-
     }
 
+    @EventListener(ApplicationStartedEvent.class)
+    public void composeCareRecommendations() throws Exception {
+        List<OwnerCareTask> ownerCareTasks = ownerRepository.findAll()
+            .stream()
+            .map(owner -> new OwnerCareTask(owner, careThreadPool))
+            .toList();
+
+        log.debug("Proposing care recommendations for {} owners...", ownerCareTasks.size());
+
+        String recommendationsText = careThreadPool.invokeAll(ownerCareTasks)
+            .stream()
+            .map(ThreadUtils::getCareTaskResult)
+            .collect(joining("\n\n", "Care recommendations from Spring PetClinic:\n", ""));
+
+        log.info(recommendationsText);
+    }
 }
