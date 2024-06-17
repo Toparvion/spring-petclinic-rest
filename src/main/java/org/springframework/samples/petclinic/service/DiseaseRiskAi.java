@@ -84,15 +84,15 @@ public class DiseaseRiskAi {
         }
     }
 
-    @Scheduled(fixedDelay = 5, timeUnit = SECONDS)
-    public void recalculateDeceaseRisks() {
+    @Scheduled(fixedDelayString = "${disease-risk-ai.recalculate.period.seconds:5}", timeUnit = SECONDS)
+    public void recalculateDiseaseRisks() {
         risksLock.writeLock().lock();
         try {
-            log.debug("Recalculating decease risks...");
+            log.debug("Recalculating diseases risks...");
 
             doAiMagic();
 
-            log.info("Risks of deceases recalculated");
+            log.info("Risks of diseases recalculated");
         }
         finally {
             risksLock.writeLock().unlock();
@@ -112,7 +112,8 @@ public class DiseaseRiskAi {
         }
     }
 
-    @EventListener(ApplicationStartedEvent.class)
+    @EventListener(value = ApplicationStartedEvent.class,
+                   condition = "event.args.length > 0 && event.args[0] == '--recommend-care'")
     public void composeCareRecommendations() throws Exception {
         List<OwnerCareTask> ownerCareTasks = ownerRepository.findAll()
             .stream()
