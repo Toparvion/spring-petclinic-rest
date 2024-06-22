@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.Visit;
@@ -84,7 +84,9 @@ public class DiseaseRiskAi {
         }
     }
 
-    @Scheduled(fixedDelayString = "${disease-risk-ai.recalculate.period.seconds:5}", timeUnit = SECONDS)
+    @Scheduled(fixedDelayString = "${risk.recalculate.period.seconds:5000}",
+        initialDelayString = "${risk.recalculate.delay.seconds:3600}",
+        timeUnit = SECONDS)
     public void recalculateDiseaseRisks() {
         risksLock.writeLock().lock();
         try {
@@ -112,7 +114,7 @@ public class DiseaseRiskAi {
         }
     }
 
-    @EventListener(value = ApplicationStartedEvent.class,
+    @EventListener(value = ApplicationReadyEvent.class,
                    condition = "event.args.length > 0 && event.args[0] == '--recommend-care'")
     public void composeCareRecommendations() throws Exception {
         List<OwnerCareTask> ownerCareTasks = ownerRepository.findAll()
