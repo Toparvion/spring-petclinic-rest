@@ -17,4 +17,14 @@ public class ThreadUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static void pauseForSeconds(int seconds) {
+        try {
+            Thread.sleep(seconds * 1_000L);
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
 }
