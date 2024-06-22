@@ -30,7 +30,7 @@ import static org.springframework.samples.petclinic.util.ThreadUtils.pauseForSec
  * @author Vladimir Plizga
  */
 @Service
-@ConditionalOnProperty(name = "pedigree-enabled", havingValue = "true")
+@ConditionalOnProperty(name = "enable-pedigree")
 public class PedigreeService {
     private static final Logger log = LoggerFactory.getLogger(PedigreeService.class);
 

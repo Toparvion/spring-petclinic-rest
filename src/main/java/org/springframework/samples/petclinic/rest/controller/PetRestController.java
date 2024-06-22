@@ -51,6 +51,7 @@ public class PetRestController implements PetsApi {
 
     private final VisitMapper visitMapper;
 
+    @Nullable
     private final DiseaseRiskAi diseaseRiskAi;
 
     @Nullable
@@ -59,7 +60,7 @@ public class PetRestController implements PetsApi {
     public PetRestController(ClinicService clinicService,
                              PetMapper petMapper,
                              VisitMapper visitMapper,
-                             DiseaseRiskAi diseaseRiskAi,
+                             @Nullable DiseaseRiskAi diseaseRiskAi,
                              @Nullable PedigreeService pedigreeService) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
@@ -91,6 +92,9 @@ public class PetRestController implements PetsApi {
 	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
 	public ResponseEntity<List<VisitDto>> listRecommendedVisits(Integer petId) {
+        if (diseaseRiskAi == null) {        // the service may be disabled
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        }
         List<VisitDto> visits = new ArrayList<>(visitMapper.toVisitsDto(diseaseRiskAi.fetchRecommendedVisits(petId)));
         if (visits.isEmpty()) {
             return ResponseEntity.notFound().build();
