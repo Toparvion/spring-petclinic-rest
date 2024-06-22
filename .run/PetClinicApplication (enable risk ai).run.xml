@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PetClinicApplication (recalculate risks)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="PetClinicApplication (enable risk ai)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="spring-petclinic-rest" />
-    <option name="PROGRAM_PARAMETERS" value="--risk.recalculate.delay.seconds=0" />
+    <option name="PROGRAM_PARAMETERS" value="--enable-risk-ai" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
