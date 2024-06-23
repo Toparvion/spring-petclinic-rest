@@ -1,12 +1,12 @@
 package org.springframework.samples.petclinic.service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.random.RandomGeneratorFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public class DiseaseRiskAi {
             visit.setDate(LocalDate.now().plusWeeks(2));
             visit.setPet(pet);
             visit.setDescription("Preventive vaccination (recommended by AI)");
-            visit.setId(RandomGeneratorFactory.getDefault().create().nextInt());
+            visit.setId((int) (Instant.now().getEpochSecond() % 100));
 
             log.info("Visit recommendation list for pet '{}' (petId={}) composed", pet.getName(), petId);
             return List.of(visit);

@@ -242,6 +242,9 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${docker.jib-maven-plugin.version}</version>
                 <configuration>
+                    <from>
+                        <image>bellsoft/liberica-openjre-alpine:21</image>
+                    </from>
                     <to>
                         <image>docker.io/${docker.image.prefix}/${project.artifactId}</image>
                         <tags>
