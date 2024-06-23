@@ -24,7 +24,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * A service for calculating disease risks for pets and providing corresponding recommendations of visits to the clinic.
- * Used in sample case #1.
+ * Used in sample case #2.
  *
  * @author Vladimir Plizga
  */

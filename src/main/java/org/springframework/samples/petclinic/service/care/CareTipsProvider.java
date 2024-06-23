@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * A service responsible for provision of pet care tips to their owners. <p/>
- * Used in sample case #2.
+ * Used in sample case #3.
  *
  * @author Vladimir Plizga
  */
