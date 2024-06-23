@@ -16,7 +16,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class RisksAiConfig {
 
     @Bean
-    public ExecutorService careRecommendationsThreadPool() {
-        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+    public ExecutorService careTipsThreadPool() {
+        int nThreads = Runtime.getRuntime().availableProcessors();
+        return Executors.newFixedThreadPool(nThreads);
     }
 }

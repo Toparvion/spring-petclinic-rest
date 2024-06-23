@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="PetClinicApplication (MySQL)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="jdbc,mysql" />
+    <option name="ACTIVE_PROFILES" value="mysql" />
     <module name="spring-petclinic-rest" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
     <method v="2">
