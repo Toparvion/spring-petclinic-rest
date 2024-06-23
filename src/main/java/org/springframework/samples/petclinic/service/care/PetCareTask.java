@@ -21,14 +21,14 @@ public class PetCareTask implements Callable<String> {
     }
 
     @Override
-    public String call() throws Exception {
+    public String call() {
         String name = pet.getName();
-        log.trace("Composing care recommendations for pet '{}'...", name);
+        log.trace("Composing care tips for pet '{}'...", name);
 
-        Thread.sleep(5_000);
+        // doing some heavy stuff
 
-        log.info("Care recommendations for pet '{}' proposed", name);
+        log.info("Care tips for pet '{}' proposed", name);
 
-        return "Your '%s' should sleep more".formatted(name);
+        return "Your %s should sleep more".formatted(name);
     }
 }

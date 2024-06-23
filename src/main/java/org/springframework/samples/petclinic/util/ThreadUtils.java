@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
  */
 public class ThreadUtils {
 
-    public static String getCareTaskResult(Future<String> future) {
+    public static String getTaskResult(Future<String> future) {
         try {
             return future.get();
         }

@@ -13,21 +13,18 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.repository.OwnerRepository;
 import org.springframework.samples.petclinic.repository.PetRepository;
-import org.springframework.samples.petclinic.service.care.OwnerCareTask;
-import org.springframework.samples.petclinic.util.ThreadUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.Collectors.joining;
 
 /**
+ * A service for calculating disease risks for pets and providing corresponding recommendations of visits to the clinic.
+ * Used in sample case #1.
  *
  * @author Vladimir Plizga
  */
@@ -37,7 +34,6 @@ public class DiseaseRiskAi {
     private static final Logger log = LoggerFactory.getLogger(DiseaseRiskAi.class);
 
     private final PetRepository petRepository;
-    private final OwnerRepository ownerRepository;
 
     /**
      * A lock to prevent inconsistency of data derived from the risks. Any number of threads can read the risks
@@ -52,13 +48,10 @@ public class DiseaseRiskAi {
      */
     private final Map<Integer, List<Visit>> visitCache = new ConcurrentHashMap<>();
 
-    private final ExecutorService careThreadPool;
 
     @Autowired
     public DiseaseRiskAi(PetRepository petRepository, OwnerRepository ownerRepository, ExecutorService careThreadPool) {
         this.petRepository = petRepository;
-        this.ownerRepository = ownerRepository;
-        this.careThreadPool = careThreadPool;
     }
 
     public List<Visit> fetchRecommendedVisits(int petId) {
@@ -112,23 +105,5 @@ public class DiseaseRiskAi {
         finally {
             visitCache.clear();   // don't forget to reset previously recommended visits as they might become obsolete
         }
-    }
-
-    @EventListener(value = ApplicationReadyEvent.class,
-                   condition = "event.args.length > 0 && event.args[0] == '--recommend-care'")
-    public void composeCareRecommendations() throws Exception {
-        List<OwnerCareTask> ownerCareTasks = ownerRepository.findAll()
-            .stream()
-            .map(owner -> new OwnerCareTask(owner, careThreadPool))
-            .toList();
-
-        log.debug("Proposing care recommendations for {} owners...", ownerCareTasks.size());
-
-        String recommendationsText = careThreadPool.invokeAll(ownerCareTasks)
-            .stream()
-            .map(ThreadUtils::getCareTaskResult)
-            .collect(joining("\n\n", "Care recommendations from Spring PetClinic:\n", ""));
-
-        log.info(recommendationsText);
     }
 }

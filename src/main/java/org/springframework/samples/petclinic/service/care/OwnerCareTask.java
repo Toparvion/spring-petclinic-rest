@@ -34,13 +34,13 @@ public class OwnerCareTask implements Callable<String> {
             .map(PetCareTask::new)
             .toList();
 
-        log.debug("Proposing care recommendations for {} pet(s) of owner {}...", petCareTasks.size(), owner.getFirstName());
+        log.debug("Proposing care tips for {} pet(s) of owner {}...", petCareTasks.size(), owner.getFirstName());
 
         return careThreadPool.invokeAll(petCareTasks)
             .stream()
-            .map(ThreadUtils::getCareTaskResult)
+            .map(ThreadUtils::getTaskResult)
             .collect(joining("\n\t- ",
-                "Dear %s, here is your pet care recommendation(s):\n\t- ".formatted(owner.getFirstName()),
+                "Dear %s, here is your pet care tip(s):\n\t- ".formatted(owner.getFirstName()),
                 ""));
     }
 

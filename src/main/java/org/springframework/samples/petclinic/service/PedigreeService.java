@@ -25,7 +25,8 @@ import static org.springframework.samples.petclinic.util.ThreadUtils.pauseForSec
 /**
  * Basic functionality to track pets' pedigrees. Currently is in BETA testing on a single pet only (so far). <br/>
  * Supports both automatic (by schedule) and manual (by request) pedigree updating which currently comes down to
- * changing the pet name from its raw form to the titled one, e.g. "Basil" -> "Basil the Second", and vice versa.
+ * changing the pet name from its raw form to the titled one, e.g. "Basil" -> "Basil the Second", and vice versa. <p/>
+ * Used in sample case #3.
  *
  * @author Vladimir Plizga
  */
