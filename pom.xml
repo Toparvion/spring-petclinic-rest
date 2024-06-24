@@ -35,6 +35,7 @@
         <!-- Docker -->
         <docker.jib-maven-plugin.version>3.4.0</docker.jib-maven-plugin.version>
         <docker.image.prefix>springcommunity</docker.image.prefix>
+        <docker.jmx.port>7199</docker.jmx.port>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     </properties>
 
@@ -252,6 +253,16 @@
                             <tag>latest</tag>
                         </tags>
                     </to>
+                    <container>
+                        <jvmFlags>
+                            <jvmFlag>-Dcom.sun.management.jmxremote=true</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.port=${docker.jmx.port}</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.authenticate=false</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.ssl=false</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.rmi.port=${docker.jmx.port}</jvmFlag>
+                            <jvmFlag>-Djava.rmi.server.hostname=localhost</jvmFlag>
+                        </jvmFlags>
+                    </container>
                 </configuration>
             </plugin>
 
