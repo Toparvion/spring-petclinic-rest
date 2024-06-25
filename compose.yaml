@@ -4,9 +4,12 @@ services:
     image: toparvion/spring-petclinic-rest
     container_name: petclinic
     environment:
-      SPRING_PROFILES_ACTIVE: postgresql,jdbc
       ENABLE_PEDIGREE: ""
+      SPRING_PROFILES_ACTIVE: postgresql,jdbc
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/petclinic"
+      SPRING_SQL_INIT_MODE: always
+      SPRING_SQL_INIT_SCHEMALOCATIONS: "classpath*:db/postgresql/initDB.sql"
+      SPRING.SQL.INIT.DATALOCATIONS: "classpath*:db/postgresql/populateDB.sql"
     ports:
       - "9966:9966"
       - "7199:7199"
