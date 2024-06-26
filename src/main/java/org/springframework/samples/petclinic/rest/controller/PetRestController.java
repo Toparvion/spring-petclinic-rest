@@ -16,20 +16,27 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.samples.petclinic.mapper.PetMapper;
+import org.springframework.samples.petclinic.mapper.VisitMapper;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.rest.api.PetsApi;
 import org.springframework.samples.petclinic.rest.dto.PetDto;
+import org.springframework.samples.petclinic.rest.dto.VisitDto;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.samples.petclinic.service.DiseaseRiskAi;
+import org.springframework.samples.petclinic.service.PedigreeService;
+import org.springframework.samples.petclinic.service.PetRegistryService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Vitaliy Fedoriv
@@ -44,9 +51,29 @@ public class PetRestController implements PetsApi {
 
     private final PetMapper petMapper;
 
-    public PetRestController(ClinicService clinicService, PetMapper petMapper) {
+    private final VisitMapper visitMapper;
+
+    @Nullable
+    private final DiseaseRiskAi diseaseRiskAi;
+
+    @Nullable
+    private final PedigreeService pedigreeService;
+
+    @Nullable
+    public final PetRegistryService petRegistryService;
+
+    public PetRestController(ClinicService clinicService,
+                             PetMapper petMapper,
+                             VisitMapper visitMapper,
+                             @Nullable DiseaseRiskAi diseaseRiskAi,
+                             @Nullable PedigreeService pedigreeService,
+                             @Nullable PetRegistryService petRegistryService) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
+        this.visitMapper = visitMapper;
+        this.diseaseRiskAi = diseaseRiskAi;
+        this.pedigreeService = pedigreeService;
+        this.petRegistryService = petRegistryService;
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -62,26 +89,50 @@ public class PetRestController implements PetsApi {
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
     public ResponseEntity<List<PetDto>> listPets() {
-        List<PetDto> pets = new ArrayList<>(petMapper.toPetsDto(this.clinicService.findAllPets()));
+        Collection<Pet> allPets = (petRegistryService == null)      // the service may be disabled
+            ? clinicService.findAllPets()
+            : clinicService.findAllPets().stream()
+                           .filter(petRegistryService::isPetRegistered)
+                           .toList();
+        List<PetDto> pets = new ArrayList<>(petMapper.toPetsDto(allPets));
         if (pets.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
+	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+    @Override
+	public ResponseEntity<List<VisitDto>> listRecommendedVisits(Integer petId) {
+        if (diseaseRiskAi == null) {        // the service may be disabled
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        }
+        List<VisitDto> visits = new ArrayList<>(visitMapper.toVisitsDto(diseaseRiskAi.fetchRecommendedVisits(petId)));
+        if (visits.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(visits);
+	}
 
-    @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
     public ResponseEntity<PetDto> updatePet(Integer petId, PetDto petDto) {
         Pet currentPet = this.clinicService.findPetById(petId);
         if (currentPet == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        currentPet.setBirthDate(petDto.getBirthDate());
-        currentPet.setName(petDto.getName());
-        currentPet.setType(petMapper.toPetType(petDto.getType()));
-        this.clinicService.savePet(currentPet);
-        return new ResponseEntity<>(petMapper.toPetDto(currentPet), HttpStatus.NO_CONTENT);
+        // pets belonging to pedigree beta testing must be processed separately
+        if (pedigreeService != null && pedigreeService.isPetInBetaTesting(currentPet.getName())) {
+            pedigreeService.updatePedigreeByRequest(currentPet.getName());
+            return new ResponseEntity<>(petMapper.toPetDto(currentPet), HttpStatus.I_AM_A_TEAPOT);
+        }
+        else {
+            currentPet.setBirthDate(petDto.getBirthDate());
+            currentPet.setName(petDto.getName());
+            currentPet.setType(petMapper.toPetType(petDto.getType()));
+            this.clinicService.savePet(currentPet);
+            return new ResponseEntity<>(petMapper.toPetDto(currentPet), HttpStatus.NO_CONTENT);
+        }
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")

@@ -1,0 +1,29 @@
+# A Docker stack of PetClinic+PostgreSQL pair to reproduce the sample case #4
+services:
+  petclinic:
+    image: toparvion/spring-petclinic-rest
+    container_name: petclinic
+    environment:
+      ENABLE_PEDIGREE: ""
+      SPRING_PROFILES_ACTIVE: postgresql,jdbc
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/petclinic"
+      SPRING_SQL_INIT_MODE: always      # comment this line if restarting existing PetClinic instance
+      SPRING_SQL_INIT_SCHEMALOCATIONS: "classpath*:db/postgresql/initDB.sql"
+      SPRING.SQL.INIT.DATALOCATIONS: "classpath*:db/postgresql/populateDB.sql"
+    ports:
+      - "9966:9966"
+      - "7199:7199"
+    depends_on:
+      - postgres
+      
+  postgres:
+    image: postgres:16.3
+    container_name: postgres
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: petclinic
+      POSTGRES_DB: petclinic
+    ports:
+      - "5432:5432"
+    restart: on-failure
