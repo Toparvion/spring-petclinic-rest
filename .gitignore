@@ -11,3 +11,6 @@ generated/
 # Easier branch switching
 springboot-petclinic-client/
 springboot-petclinic-server/
+
+/dumps/**
+!/dumps/.gitkeep
