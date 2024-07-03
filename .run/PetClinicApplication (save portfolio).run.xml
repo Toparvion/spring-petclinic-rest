@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PetClinicApplication (portfolio storage)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="PetClinicApplication (save portfolio)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="spring-petclinic-rest" />
     <option name="PROGRAM_PARAMETERS" value="--enable-portfolio --save-portfolio=true" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
-    <option name="VM_PARAMETERS" value="@jmx.opts -Xmx64M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dumps/petclinic-%p.hprof" />
+    <option name="VM_PARAMETERS" value="@jmx.opts -Xmx64M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dumps/save-portfolio.hprof" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

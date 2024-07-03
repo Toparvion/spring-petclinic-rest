@@ -54,7 +54,8 @@ public class VetRestController implements VetsApi {
     @Nullable
     private final PortfolioService portfolioService;
 
-    public VetRestController(ClinicService clinicService, VetMapper vetMapper, SpecialtyMapper specialtyMapper, @Nullable PortfolioService portfolioService) {
+    public VetRestController(ClinicService clinicService, VetMapper vetMapper, SpecialtyMapper specialtyMapper,
+                             @Nullable PortfolioService portfolioService) {
         this.clinicService = clinicService;
         this.vetMapper = vetMapper;
         this.specialtyMapper = specialtyMapper;
