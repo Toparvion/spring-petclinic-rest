@@ -15,6 +15,11 @@
  */
 package org.springframework.samples.petclinic.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,10 +29,11 @@ import org.springframework.samples.petclinic.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * Mostly used as a facade for all Petclinic controllers
@@ -46,6 +52,9 @@ public class ClinicServiceImpl implements ClinicService {
     private final SpecialtyRepository specialtyRepository;
     private final PetTypeRepository petTypeRepository;
 
+    // for heap dump analysis demonstration
+    private final Set<Pet> petsCache = new HashSet<>();
+
     @Autowired
     public ClinicServiceImpl(
         PetRepository petRepository,
@@ -62,11 +71,14 @@ public class ClinicServiceImpl implements ClinicService {
         this.petTypeRepository = petTypeRepository;
     }
 
-    @Override
+	@Override
     @Transactional(readOnly = true)
-    public Collection<Pet> findAllPets() throws DataAccessException {
-        return petRepository.findAll();
-    }
+	public Collection<Pet> findAllPets() throws DataAccessException {
+        if (petsCache.isEmpty()) {
+            petsCache.addAll(petRepository.findAll());
+        }
+        return petsCache;
+	}
 
     @Override
     @Transactional
