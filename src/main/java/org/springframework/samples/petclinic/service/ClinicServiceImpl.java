@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +57,9 @@ public class ClinicServiceImpl implements ClinicService {
     private SpecialtyRepository specialtyRepository;
 	private PetTypeRepository petTypeRepository;
 
+    // for heap dump analysis demonstration
+    private final Set<Pet> petsCache = new HashSet<>();
+
     @Autowired
      public ClinicServiceImpl(
        		 PetRepository petRepository,
@@ -73,9 +77,12 @@ public class ClinicServiceImpl implements ClinicService {
     }
 
 	@Override
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
 	public Collection<Pet> findAllPets() throws DataAccessException {
-		return petRepository.findAll();
+        if (petsCache.isEmpty()) {
+            petsCache.addAll(petRepository.findAll());
+        }
+        return petsCache;
 	}
 
 	@Override
