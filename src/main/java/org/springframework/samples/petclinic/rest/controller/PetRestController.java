@@ -33,7 +33,6 @@ import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.samples.petclinic.service.DiseaseRiskAi;
 import org.springframework.samples.petclinic.service.PedigreeService;
 import org.springframework.samples.petclinic.service.PetRegistryService;
-import org.springframework.samples.petclinic.service.VetControlService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,37 +60,28 @@ public class PetRestController implements PetsApi {
     private final PedigreeService pedigreeService;
 
     @Nullable
-    private final PetRegistryService petRegistryService;
-
-    @Nullable
-    private final VetControlService vetControlService;
+    public final PetRegistryService petRegistryService;
 
     public PetRestController(ClinicService clinicService,
                              PetMapper petMapper,
                              VisitMapper visitMapper,
                              @Nullable DiseaseRiskAi diseaseRiskAi,
                              @Nullable PedigreeService pedigreeService,
-                             @Nullable PetRegistryService petRegistryService,
-                             @Nullable VetControlService vetControlService) {
+                             @Nullable PetRegistryService petRegistryService) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
         this.visitMapper = visitMapper;
         this.diseaseRiskAi = diseaseRiskAi;
         this.pedigreeService = pedigreeService;
         this.petRegistryService = petRegistryService;
-        this.vetControlService = vetControlService;
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
     public ResponseEntity<PetDto> getPet(Integer petId) {
-        Pet petById = this.clinicService.findPetById(petId);
-        PetDto pet = petMapper.toPetDto(petById);
+        PetDto pet = petMapper.toPetDto(this.clinicService.findPetById(petId));
         if (pet == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        if (vetControlService != null && List.of("snake", "lizard").contains(petById.getType().getName())) {
-            vetControlService.notifyOnDangerousAnimal(petById);
         }
         return new ResponseEntity<>(pet, HttpStatus.OK);
     }
