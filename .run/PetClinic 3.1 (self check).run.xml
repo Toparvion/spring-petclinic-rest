@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PetClinic 3.1 (self check)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="spring-petclinic-rest" />
+    <option name="PROGRAM_PARAMETERS" value="--enable-self-check" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
+    <option name="VM_PARAMETERS" value="@jmx.opts -Xmx512m -XX:StartFlightRecording=filename=dumps/my.jfr,dumponexit=true,settings=profile.jfc,jdk.FileRead#threshold=2ms -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dumps/self-check.hprof" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
