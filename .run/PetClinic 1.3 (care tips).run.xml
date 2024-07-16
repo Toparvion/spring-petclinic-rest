@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PetClinicApplication (pedigree)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="postgresql" />
+  <configuration default="false" name="PetClinic 1.3 (care tips)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="spring-petclinic-rest" />
-    <option name="PROGRAM_PARAMETERS" value="--enable-pedigree" />
+    <option name="PROGRAM_PARAMETERS" value="--enable-care-tips" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
+    <option name="VM_PARAMETERS" value="-XX:ActiveProcessorCount=9" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

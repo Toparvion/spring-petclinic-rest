@@ -1,9 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PetClinicApplication (care tips)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="PetClinic 1.1 (pet registry)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="spring-petclinic-rest" />
-    <option name="PROGRAM_PARAMETERS" value="--enable-care-tips" />
+    <option name="PROGRAM_PARAMETERS" value="--enable-pet-registry" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
-    <option name="VM_PARAMETERS" value="-XX:ActiveProcessorCount=9" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
