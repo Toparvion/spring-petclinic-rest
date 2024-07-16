@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PetClinicApplication (save portfolio)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="PetClinic 2.2 (save portfolio)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="spring-petclinic-rest" />
     <option name="PROGRAM_PARAMETERS" value="--enable-portfolio --save-portfolio=true" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
