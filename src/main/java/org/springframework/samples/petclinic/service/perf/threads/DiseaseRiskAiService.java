@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service;
+package org.springframework.samples.petclinic.service.perf.threads;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.repository.PetRepository;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +28,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Vladimir Plizga
  */
 @Service
+@EnableScheduling           // to enable background risks recalculation
 @ConditionalOnProperty("enable-risk-ai")
-public class DiseaseRiskAi {
-    private static final Logger log = LoggerFactory.getLogger(DiseaseRiskAi.class);
+public class DiseaseRiskAiService {
+    private static final Logger log = LoggerFactory.getLogger(DiseaseRiskAiService.class);
 
     private final PetRepository petRepository;
 
@@ -48,7 +50,7 @@ public class DiseaseRiskAi {
 
 
     @Autowired
-    public DiseaseRiskAi(PetRepository petRepository) {
+    public DiseaseRiskAiService(PetRepository petRepository) {
         this.petRepository = petRepository;
     }
 

@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service;
+package org.springframework.samples.petclinic.service.perf.threads;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.springframework.samples.petclinic.util.ThreadUtils.pauseForSeconds;
+import static org.springframework.samples.petclinic.service.perf.threads.ThreadUtils.pauseForSeconds;
 
 /**
  * Basic functionality to track pets' pedigrees. Currently is in BETA testing on a single pet only (so far). <br/>

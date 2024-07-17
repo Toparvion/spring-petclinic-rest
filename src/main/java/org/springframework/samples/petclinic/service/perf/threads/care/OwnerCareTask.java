@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service.care;
+package org.springframework.samples.petclinic.service.perf.threads.care;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.samples.petclinic.model.Owner;
-import org.springframework.samples.petclinic.util.ThreadUtils;
+import org.springframework.samples.petclinic.service.perf.threads.ThreadUtils;
 
 import static java.util.stream.Collectors.joining;
 

@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service.care;
+package org.springframework.samples.petclinic.service.perf.threads.care;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.samples.petclinic.repository.OwnerRepository;
-import org.springframework.samples.petclinic.util.ThreadUtils;
+import org.springframework.samples.petclinic.service.perf.threads.ThreadUtils;
 import org.springframework.stereotype.Service;
 
 import static java.util.stream.Collectors.joining;

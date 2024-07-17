@@ -30,9 +30,9 @@ import org.springframework.samples.petclinic.rest.api.PetsApi;
 import org.springframework.samples.petclinic.rest.dto.PetDto;
 import org.springframework.samples.petclinic.rest.dto.VisitDto;
 import org.springframework.samples.petclinic.service.ClinicService;
-import org.springframework.samples.petclinic.service.DiseaseRiskAi;
-import org.springframework.samples.petclinic.service.PedigreeService;
-import org.springframework.samples.petclinic.service.PetRegistryService;
+import org.springframework.samples.petclinic.service.perf.threads.DiseaseRiskAiService;
+import org.springframework.samples.petclinic.service.perf.threads.PedigreeService;
+import org.springframework.samples.petclinic.service.perf.threads.PetRegistryService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +54,7 @@ public class PetRestController implements PetsApi {
     private final VisitMapper visitMapper;
 
     @Nullable
-    private final DiseaseRiskAi diseaseRiskAi;
+    private final DiseaseRiskAiService diseaseRiskAiService;
 
     @Nullable
     private final PedigreeService pedigreeService;
@@ -65,13 +65,13 @@ public class PetRestController implements PetsApi {
     public PetRestController(ClinicService clinicService,
                              PetMapper petMapper,
                              VisitMapper visitMapper,
-                             @Nullable DiseaseRiskAi diseaseRiskAi,
+                             @Nullable DiseaseRiskAiService diseaseRiskAiService,
                              @Nullable PedigreeService pedigreeService,
                              @Nullable PetRegistryService petRegistryService) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
         this.visitMapper = visitMapper;
-        this.diseaseRiskAi = diseaseRiskAi;
+        this.diseaseRiskAiService = diseaseRiskAiService;
         this.pedigreeService = pedigreeService;
         this.petRegistryService = petRegistryService;
     }
@@ -104,10 +104,10 @@ public class PetRestController implements PetsApi {
 	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
 	public ResponseEntity<List<VisitDto>> listRecommendedVisits(Integer petId) {
-        if (diseaseRiskAi == null) {        // the service may be disabled
+        if (diseaseRiskAiService == null) {        // the service may be disabled
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
         }
-        List<VisitDto> visits = new ArrayList<>(visitMapper.toVisitsDto(diseaseRiskAi.fetchRecommendedVisits(petId)));
+        List<VisitDto> visits = new ArrayList<>(visitMapper.toVisitsDto(diseaseRiskAiService.fetchRecommendedVisits(petId)));
         if (visits.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
