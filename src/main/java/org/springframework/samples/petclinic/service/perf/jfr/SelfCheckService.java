@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service;
+package org.springframework.samples.petclinic.service.perf.jfr;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

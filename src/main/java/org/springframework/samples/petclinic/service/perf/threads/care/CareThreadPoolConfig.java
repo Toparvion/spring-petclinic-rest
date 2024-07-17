@@ -1,19 +1,18 @@
-package org.springframework.samples.petclinic.config;
+package org.springframework.samples.petclinic.service.perf.threads.care;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
+ * A provider of thread pool for executing tasks related to care tips
  *
  * @author Vladimir Plizga
  */
 @Configuration
-@EnableScheduling           // to enable background risks recalculation
-public class RisksAiConfig {
+public class CareThreadPoolConfig {
 
     @Bean
     public ExecutorService careTipsThreadPool() {

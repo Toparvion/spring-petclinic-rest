@@ -52,9 +52,6 @@ public class ClinicServiceImpl implements ClinicService {
     private final SpecialtyRepository specialtyRepository;
     private final PetTypeRepository petTypeRepository;
 
-    // for heap dump analysis demonstration
-    private final Set<Pet> petsCache = new HashSet<>();
-
     @Autowired
     public ClinicServiceImpl(
         PetRepository petRepository,
@@ -74,10 +71,7 @@ public class ClinicServiceImpl implements ClinicService {
 	@Override
     @Transactional(readOnly = true)
 	public Collection<Pet> findAllPets() throws DataAccessException {
-        if (petsCache.isEmpty()) {
-            petsCache.addAll(petRepository.findAll());
-        }
-        return petsCache;
+        return petRepository.findAll();
 	}
 
     @Override

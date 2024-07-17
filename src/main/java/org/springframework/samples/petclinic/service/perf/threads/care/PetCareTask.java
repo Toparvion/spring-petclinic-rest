@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service.care;
+package org.springframework.samples.petclinic.service.perf.threads.care;
 
 import java.util.concurrent.Callable;
 

@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.service;
+package org.springframework.samples.petclinic.service.perf.threads;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,19 +1,22 @@
-package org.springframework.samples.petclinic.util;
+package org.springframework.samples.petclinic.service.perf.threads;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- *
  * @author Vladimir Plizga
  */
-public class ThreadUtils {
+public final class ThreadUtils {
 
     public static String getTaskResult(Future<String> future) {
         try {
             return future.get();
         }
-        catch (InterruptedException | ExecutionException e) {
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+        catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -27,4 +30,6 @@ public class ThreadUtils {
             throw new RuntimeException(e);
         }
     }
+
+      private ThreadUtils() { /* not instantiable */ }
 }

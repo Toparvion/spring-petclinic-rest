@@ -32,7 +32,7 @@ import org.springframework.samples.petclinic.model.Vet;
 import org.springframework.samples.petclinic.rest.api.VetsApi;
 import org.springframework.samples.petclinic.rest.dto.VetDto;
 import org.springframework.samples.petclinic.service.ClinicService;
-import org.springframework.samples.petclinic.service.PortfolioService;
+import org.springframework.samples.petclinic.service.perf.memory.PortfolioService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
