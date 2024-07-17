@@ -1,20 +1,19 @@
 package org.springframework.samples.petclinic.service.perf.threads;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import static java.lang.ProcessBuilder.Redirect.INHERIT;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 
-import static java.lang.ProcessBuilder.Redirect.INHERIT;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Vladimir Plizga
@@ -27,7 +26,7 @@ public class OwnerInfoService {
     public void checkOwnerInfo(String ownerTelephone) {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
         String scriptFileName = isWindows
-            ? "getinfo.bat"
+            ? "getinfo.cmd"
             : "getinfo.sh";
         Path scriptTempPath = Path.of(System.getProperty("java.io.tmpdir"), scriptFileName);
         try {
@@ -43,7 +42,6 @@ public class OwnerInfoService {
 
             String[] command = isWindows
                 ? "cmd.exe /c %s %s".formatted(scriptTempPath, ownerTelephone).split(" ")
-//                : "ping -qc 2 localhost".split(" ");
                 : "/bin/sh -c %s %s".formatted(scriptTempPath, ownerTelephone).split(" ");
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.redirectError(INHERIT);
