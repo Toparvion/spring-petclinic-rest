@@ -16,9 +16,15 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
+import java.util.Collection;
+import java.util.List;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.samples.petclinic.mapper.OwnerMapper;
 import org.springframework.samples.petclinic.mapper.PetMapper;
 import org.springframework.samples.petclinic.mapper.VisitMapper;
@@ -27,18 +33,19 @@ import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.rest.api.OwnersApi;
-import org.springframework.samples.petclinic.rest.dto.*;
+import org.springframework.samples.petclinic.rest.dto.OwnerDto;
+import org.springframework.samples.petclinic.rest.dto.OwnerFieldsDto;
+import org.springframework.samples.petclinic.rest.dto.PetDto;
+import org.springframework.samples.petclinic.rest.dto.PetFieldsDto;
+import org.springframework.samples.petclinic.rest.dto.VisitDto;
+import org.springframework.samples.petclinic.rest.dto.VisitFieldsDto;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.samples.petclinic.service.perf.threads.OwnerInfoService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import jakarta.transaction.Transactional;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Vitaliy Fedoriv
@@ -57,14 +64,19 @@ public class OwnerRestController implements OwnersApi {
 
     private final VisitMapper visitMapper;
 
+    @Nullable
+    private final OwnerInfoService ownerInfoService;
+
     public OwnerRestController(ClinicService clinicService,
                                OwnerMapper ownerMapper,
                                PetMapper petMapper,
-                               VisitMapper visitMapper) {
+                               VisitMapper visitMapper,
+                               @Nullable OwnerInfoService ownerInfoService) {
         this.clinicService = clinicService;
         this.ownerMapper = ownerMapper;
         this.petMapper = petMapper;
         this.visitMapper = visitMapper;
+        this.ownerInfoService = ownerInfoService;
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -78,6 +90,9 @@ public class OwnerRestController implements OwnersApi {
         }
         if (owners.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (ownerInfoService != null) {     // the service may be disabled
+            owners.forEach(owner -> ownerInfoService.checkOwnerInfo(owner.getTelephone()));
         }
         return new ResponseEntity<>(ownerMapper.toOwnerDtoCollection(owners), HttpStatus.OK);
     }
