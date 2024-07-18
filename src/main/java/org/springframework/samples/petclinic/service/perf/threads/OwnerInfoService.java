@@ -36,8 +36,9 @@ public class OwnerInfoService {
             OutputStream scriptOutStream = Files.newOutputStream(scriptTempPath);
             FileCopyUtils.copy(scriptInStream, scriptOutStream);
             if (!isWindows) {
-                Process chmod = Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptTempPath.toString()});
-                chmod.waitFor();
+                Runtime.getRuntime()
+                    .exec(new String[] {"chmod", "+x", scriptTempPath.toString()})
+                    .waitFor();
             }
 
             String[] command = isWindows
@@ -47,8 +48,9 @@ public class OwnerInfoService {
             pb.redirectError(INHERIT);
             pb.redirectOutput(INHERIT);
             Process process = pb.start();
-
-            process.waitFor();
+            log.debug("External process launched...");
+            int result = process.waitFor();
+            log.info("Number of owner accounts in other services: {}", result);
         }
         catch (IOException e) {
             log.error("Failed to check owner info", e);
