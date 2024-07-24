@@ -15,12 +15,6 @@
  */
 package org.springframework.samples.petclinic.rest.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +32,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Vitaliy Fedoriv
@@ -81,7 +80,7 @@ public class VetRestController implements VetsApi {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         if (portfolioService != null) {
-            portfolioService.loadVetPortfolio(vet);
+            portfolioService.processVetPortfolio(vet);
         }
         return new ResponseEntity<>(vetMapper.toVetDto(vet), HttpStatus.OK);
     }

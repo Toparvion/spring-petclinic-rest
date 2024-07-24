@@ -1,14 +1,7 @@
 package org.springframework.samples.petclinic.service.perf.memory;
 
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,6 +11,12 @@ import org.springframework.samples.petclinic.model.Vet;
 import org.springframework.samples.petclinic.model.VetPortfolio;
 import org.springframework.samples.petclinic.repository.PetRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Vladimir Plizga
@@ -47,8 +46,8 @@ public class PortfolioService {
         log.debug("Portfolio sharing enabled: {}", isSharingEnabled);
     }
 
-    public void loadVetPortfolio(Vet vet) {
-        VetPortfolio portfolio = fetchPortfolioFor(vet);
+    public void processVetPortfolio(Vet vet) {
+        VetPortfolio portfolio = loadPortfolioFor(vet);
 
         log.info("Loaded portfolio: {}", portfolio);
 
@@ -63,7 +62,7 @@ public class PortfolioService {
         }
     }
 
-    private VetPortfolio fetchPortfolioFor(Vet vet) {
+    private VetPortfolio loadPortfolioFor(Vet vet) {
         // We currently support only the last entry of portfolio - current internship
         var documentScan = new byte[1 << 23];     // emulating loading of approx. 8MB
         return new VetPortfolio(
@@ -88,6 +87,6 @@ public class PortfolioService {
     @EventListener(ApplicationReadyEvent.class)
     public void warmupPetCache() {
         petsCache.addAll(petRepository.findAll());
-        log.debug("Pets cached warmed up (size={})", petsCache.size());
+        log.debug("Pets cache warmed up (size={})", petsCache.size());
     }
 }
