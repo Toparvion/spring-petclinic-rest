@@ -30,7 +30,6 @@ import org.springframework.samples.petclinic.mapper.PetMapper;
 import org.springframework.samples.petclinic.mapper.VisitMapper;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
-import org.springframework.samples.petclinic.model.PetType;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.rest.api.OwnersApi;
 import org.springframework.samples.petclinic.rest.dto.OwnerDto;
@@ -155,8 +154,6 @@ public class OwnerRestController implements OwnersApi {
         Owner owner = new Owner();
         owner.setId(ownerId);
         pet.setOwner(owner);
-        PetType petType = this.clinicService.findPetTypeByName(pet.getType().getName());
-        pet.setType(petType);
         this.clinicService.savePet(pet);
         PetDto petDto = petMapper.toPetDto(pet);
         headers.setLocation(UriComponentsBuilder.newInstance().path("/api/pets/{id}")
