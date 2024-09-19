@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PetClinic 3.2 (specialty)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="spring-petclinic-rest" />
+    <option name="PROGRAM_PARAMETERS" value="--enable-specialty" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
+    <option name="VM_PARAMETERS" value="@jmx.opts -Xmx64m -XX:StartFlightRecording=filename=dumps/specialty.jfr,delay=5s,settings=./allocation.jfc -XX:FlightRecorderOptions=stackdepth=512" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

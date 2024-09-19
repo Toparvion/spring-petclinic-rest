@@ -16,21 +16,28 @@
 
 package org.springframework.samples.petclinic.rest.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.samples.petclinic.mapper.SpecialtyMapper;
 import org.springframework.samples.petclinic.model.Specialty;
 import org.springframework.samples.petclinic.rest.api.SpecialtiesApi;
 import org.springframework.samples.petclinic.rest.dto.SpecialtyDto;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.samples.petclinic.service.perf.jfr.SpecialtyService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Vitaliy Fedoriv
@@ -45,19 +52,31 @@ public class SpecialtyRestController implements SpecialtiesApi {
 
     private final SpecialtyMapper specialtyMapper;
 
-    public SpecialtyRestController(ClinicService clinicService, SpecialtyMapper specialtyMapper) {
+    @Nullable
+    private final SpecialtyService specialtyService;
+
+    public SpecialtyRestController(ClinicService clinicService, SpecialtyMapper specialtyMapper, @Nullable SpecialtyService specialtyService) {
         this.clinicService = clinicService;
         this.specialtyMapper = specialtyMapper;
+        this.specialtyService = specialtyService;
     }
 
     @PreAuthorize("hasRole(@roles.VET_ADMIN)")
     @Override
     public ResponseEntity<List<SpecialtyDto>> listSpecialties() {
         List<SpecialtyDto> specialties = new ArrayList<>();
-        specialties.addAll(specialtyMapper.toSpecialtyDtos(this.clinicService.findAllSpecialties()));
+        Collection<Specialty> allSpecialties = this.clinicService.findAllSpecialties();
+        specialties.addAll(specialtyMapper.toSpecialtyDtos(allSpecialties));
         if (specialties.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        if (specialtyService != null) {
+            Map<Specialty, String> externalVets = specialtyService.findExternalVets(allSpecialties);
+            if (!externalVets.isEmpty()) {
+                return new ResponseEntity<>(specialties, HttpStatus.PARTIAL_CONTENT);
+            }
+        }
+
         return new ResponseEntity<>(specialties, HttpStatus.OK);
     }
 
