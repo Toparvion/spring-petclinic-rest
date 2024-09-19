@@ -1059,6 +1059,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+  /pets/{petId}/diagnostics:
+    get:
+      tags:
+        - pet
+      operationId: petDiagnostics
+      summary: Diagnose a pet with AI
+      description: Leverage an LLM to determine the right diagnosis for a pet
+      parameters:
+        - name: petId
+          in: path
+          description: The ID of the pet.
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            example: 1
+        - name: symptoms
+          in: query
+          description: Current symptoms of the pet (in free form)
+          required: false
+          example: Increased temperature
+          schema: 
+            type: string
+      responses: 
+        200:
+          description: diagnosis
+          headers:
+            ETag:
+              description: An ID for this version of the response.
+              schema:
+                type: string     
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'     
+        304:
+          description: Not modified.
+          headers:
+            ETag:
+              description: An ID for this version of the response.
+              schema:
+                type: string
+        500:
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'                
   /visits:
     get:
       tags:
@@ -2262,3 +2311,32 @@ components:
           example: admin
       required:
         - name
+    Summary:
+      title: Summary
+      description: A brief summary of data inferred by LLM based on the provided anamnesis  
+      type: object
+      properties:
+        diagnosis:
+          title: diagnosis
+          description: The ICD10 code of diagnosis
+          type: string
+          maxLength: 7
+          minLength: 7
+          example: pLvbnXD
+        prescription:
+          title: prescription
+          description: Short name of a drug to take
+          type: string
+          maxLength: 256
+          minLength: 1
+          example: Full Marks
+        nextVisit:
+          title: next visit date
+          description: The date of next visit to a veterinarian (year, month, day)
+          type: string
+          format: date
+          example: '2024-10-07'
+      required:
+        - diagnosis
+        - prescription
+        - nextVisit

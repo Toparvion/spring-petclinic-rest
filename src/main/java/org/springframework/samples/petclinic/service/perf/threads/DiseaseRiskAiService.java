@@ -1,24 +1,26 @@
 package org.springframework.samples.petclinic.service.perf.threads;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.samples.petclinic.model.Pet;
-import org.springframework.samples.petclinic.model.Visit;
-import org.springframework.samples.petclinic.repository.PetRepository;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.Visit;
+import org.springframework.samples.petclinic.repository.PetRepository;
+import org.springframework.samples.petclinic.service.perf.FakeImpl;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * A service for calculating disease risks for pets and providing corresponding recommendations of visits to the clinic.
@@ -57,6 +59,7 @@ public class DiseaseRiskAiService {
         return visitCache.computeIfAbsent(petId, this::recommendVisits);
     }
 
+    @FakeImpl("Simulates visit recommendations by returning a single visit with fixed contents")
     private List<Visit> recommendVisits(int petId) {
         risksLock.readLock().lock();
         try {
@@ -93,6 +96,7 @@ public class DiseaseRiskAiService {
         }
     }
 
+    @FakeImpl("Emulates an inference of AI by means of pausing the thead for a comparable amount of time")
     private void doAiMagic() {
         try {
             Thread.sleep(5_000);        // emulate ML logic operation

@@ -28,8 +28,12 @@ import org.springframework.samples.petclinic.mapper.VisitMapper;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.rest.api.PetsApi;
 import org.springframework.samples.petclinic.rest.dto.PetDto;
+import org.springframework.samples.petclinic.rest.dto.SummaryDto;
 import org.springframework.samples.petclinic.rest.dto.VisitDto;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.samples.petclinic.service.perf.memory.ai.AiConversation.Summary;
+import org.springframework.samples.petclinic.service.perf.memory.ai.DiagnosisService;
+import org.springframework.samples.petclinic.service.perf.memory.ai.SummaryMapper;
 import org.springframework.samples.petclinic.service.perf.threads.DiseaseRiskAiService;
 import org.springframework.samples.petclinic.service.perf.threads.PedigreeService;
 import org.springframework.samples.petclinic.service.perf.threads.PetRegistryService;
@@ -60,20 +64,28 @@ public class PetRestController implements PetsApi {
     private final PedigreeService pedigreeService;
 
     @Nullable
-    public final PetRegistryService petRegistryService;
+    private final PetRegistryService petRegistryService;
+
+    @Nullable
+    private final DiagnosisService diagnosisService;
+    private final SummaryMapper summaryMapper;
 
     public PetRestController(ClinicService clinicService,
                              PetMapper petMapper,
                              VisitMapper visitMapper,
                              @Nullable DiseaseRiskAiService diseaseRiskAiService,
                              @Nullable PedigreeService pedigreeService,
-                             @Nullable PetRegistryService petRegistryService) {
+                             @Nullable PetRegistryService petRegistryService,
+                             @Nullable DiagnosisService diagnosisService,
+                             SummaryMapper summaryMapper) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
         this.visitMapper = visitMapper;
         this.diseaseRiskAiService = diseaseRiskAiService;
         this.pedigreeService = pedigreeService;
         this.petRegistryService = petRegistryService;
+        this.diagnosisService = diagnosisService;
+        this.summaryMapper = summaryMapper;
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -114,7 +126,22 @@ public class PetRestController implements PetsApi {
         return ResponseEntity.ok(visits);
 	}
 
-	@PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+    @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+    @Override
+    public ResponseEntity<SummaryDto> petDiagnostics(Integer petId, String symptoms) {
+        if (diagnosisService == null) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        }
+
+        Summary summary = diagnosisService.diagnoseWithAi(petId, symptoms);
+        SummaryDto summaryDto = summaryMapper.toSummaryDto(summary);
+
+        return (summaryDto != null)
+            ? ResponseEntity.ok(summaryDto)
+            : ResponseEntity.notFound().build();
+    }
+
+    @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
     @Override
     public ResponseEntity<PetDto> updatePet(Integer petId, PetDto petDto) {
         Pet currentPet = this.clinicService.findPetById(petId);
