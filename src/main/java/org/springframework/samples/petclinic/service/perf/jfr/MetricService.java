@@ -1,15 +1,9 @@
 package org.springframework.samples.petclinic.service.perf.jfr;
 
-import java.lang.management.ManagementFactory;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -18,7 +12,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Sample metrics provider designed to be used with {@link SpecialtyService}
@@ -31,9 +31,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class MetricService {
     private static final Logger log = LoggerFactory.getLogger(MetricService.class);
 
-    private static final int BUFFERING_THRESHOLD = 90;
+    private static final int BUFFERING_THRESHOLD = 89;
 
     private final List<ByteBuffer> rawMetrics = new ArrayList<>();
+    private boolean bufferFull = false;
 
     private final MeterRegistry registry;
 
@@ -43,16 +44,24 @@ public class MetricService {
 
     @Scheduled(fixedDelay = 500, timeUnit = MILLISECONDS)
     public void collectMetrics() {
-        long memoryUsed = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
-        long memoryMax = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
+        MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+        long memoryUsed = memoryUsage.getUsed();
+        long memoryMax = memoryUsage.getMax();
         double usedPercent = (double) memoryUsed / (double) memoryMax * 100;
         if (usedPercent <= BUFFERING_THRESHOLD) {
             var metricBuffer = gatherMetricData();
             rawMetrics.add(metricBuffer);
-            log.debug("Collected new portion of metrics. Current number of entries: {}", rawMetrics.size());
+            if (bufferFull) {
+                log.info("Continuing to collect metrics from count: {}", rawMetrics.size());
+            }
+            bufferFull = false;
         }
         else {
-            log.debug("Metrics buffer is not updated due high memory consumption: %.2f%%".formatted(usedPercent));
+            if (!bufferFull) {
+                log.info("Metrics buffer is full with %d entries (memory used: %.2f%%)"
+                    .formatted(rawMetrics.size(), usedPercent));
+            }
+            bufferFull = true;
         }
     }
 
@@ -66,8 +75,13 @@ public class MetricService {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void registerMetrics() {
-        Gauge.builder("metricsCount", rawMetrics::size)
+        // available as http://localhost:9966/petclinic/actuator/metrics/petclinic.metrics.count
+        Gauge.builder("petclinic.metrics.count", rawMetrics::size)
             .baseUnit("pcs")
+            .register(registry);
+
+        // available as http://localhost:9966/petclinic/actuator/metrics/petclinic.metrics.full
+        Gauge.builder("petclinic.metrics.full", () -> bufferFull ? 1 : 0)
             .register(registry);
     }
 }
