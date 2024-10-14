@@ -1,3 +1,9 @@
+> [!NOTE]
+>
+> This fork contains several artificially introduced bugs to showcase various techniques for performance troubleshooting. See the `perf` [package](https://github.com/Toparvion/spring-petclinic-rest/tree/master/src/main/java/org/springframework/samples/petclinic/service/perf) for corresponding classes or [this page](https://toparvion.pro/project/bugclinic/) (in Russian only so far) for description and explanation of the bugs.
+
+
+
 # REST version of Spring PetClinic Sample Application (spring-framework-petclinic extend ) 
 
 [![Java Build Status](https://github.com/spring-petclinic/spring-petclinic-rest/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-petclinic/spring-petclinic-rest/actions/workflows/maven-build.yml)
