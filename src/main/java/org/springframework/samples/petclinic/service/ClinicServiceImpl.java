@@ -15,7 +15,6 @@
  */
 package org.springframework.samples.petclinic.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.orm.ObjectRetrievalFailureException;
@@ -56,7 +55,6 @@ public class ClinicServiceImpl implements ClinicService {
     private final SpecialtyRepository specialtyRepository;
     private final PetTypeRepository petTypeRepository;
 
-    @Autowired
     public ClinicServiceImpl(
         PetRepository petRepository,
         VetRepository vetRepository,
@@ -207,6 +205,7 @@ public class ClinicServiceImpl implements ClinicService {
     @Override
     @Transactional
     public void savePet(Pet pet) throws DataAccessException {
+        pet.setType(findPetTypeById(pet.getType().getId()));
         petRepository.save(pet);
     }
 

@@ -14,3 +14,16 @@ springboot-petclinic-server/
 
 /dumps/**
 !/dumps/.gitkeep
+
+# jenv local settings
+.java-version
+
+# Mac OS X indexing
+.DS_Store
+
+# asdf generated files
+.tool-versions
+.factorypath
+
+# newman reports
+./src/test/postman/reports/

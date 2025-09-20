@@ -173,10 +173,4 @@ public class PetRestController implements PetsApi {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
-    @Override
-    public ResponseEntity<PetDto> addPet(PetDto petDto) {
-        this.clinicService.savePet(petMapper.toPet(petDto));
-        return new ResponseEntity<>(petDto, HttpStatus.OK);
-    }
 }
