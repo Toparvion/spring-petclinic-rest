@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="PetClinic 2.3 (share portfolio)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="spring-petclinic-rest" />
+    <module name="spring-petclinic-rest.main" />
     <option name="PROGRAM_PARAMETERS" value="--enable-portfolio --share-portfolio=true" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.samples.petclinic.PetClinicApplication" />
     <option name="VM_PARAMETERS" value="@jmx.opts -Xmx64M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dumps/share-portfolio.hprof" />

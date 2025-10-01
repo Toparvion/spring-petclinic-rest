@@ -34,6 +34,7 @@ import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.samples.petclinic.service.perf.memory.ai.AiConversation.Summary;
 import org.springframework.samples.petclinic.service.perf.memory.ai.DiagnosisService;
 import org.springframework.samples.petclinic.service.perf.memory.ai.SummaryMapper;
+import org.springframework.samples.petclinic.service.perf.profile.PetListPostProcessor;
 import org.springframework.samples.petclinic.service.perf.threads.DiseaseRiskAiService;
 import org.springframework.samples.petclinic.service.perf.threads.PedigreeService;
 import org.springframework.samples.petclinic.service.perf.threads.PetRegistryService;
@@ -70,6 +71,9 @@ public class PetRestController implements PetsApi {
     private final DiagnosisService diagnosisService;
     private final SummaryMapper summaryMapper;
 
+    @Nullable
+    private final PetListPostProcessor petListPostProcessor;
+
     public PetRestController(ClinicService clinicService,
                              PetMapper petMapper,
                              VisitMapper visitMapper,
@@ -77,7 +81,8 @@ public class PetRestController implements PetsApi {
                              @Nullable PedigreeService pedigreeService,
                              @Nullable PetRegistryService petRegistryService,
                              @Nullable DiagnosisService diagnosisService,
-                             SummaryMapper summaryMapper) {
+                             SummaryMapper summaryMapper,
+                             @Nullable PetListPostProcessor petListPostProcessor) {
         this.clinicService = clinicService;
         this.petMapper = petMapper;
         this.visitMapper = visitMapper;
@@ -86,6 +91,7 @@ public class PetRestController implements PetsApi {
         this.petRegistryService = petRegistryService;
         this.diagnosisService = diagnosisService;
         this.summaryMapper = summaryMapper;
+        this.petListPostProcessor = petListPostProcessor;
     }
 
     @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
@@ -109,6 +115,9 @@ public class PetRestController implements PetsApi {
         List<PetDto> pets = new ArrayList<>(petMapper.toPetsDto(allPets));
         if (pets.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (petListPostProcessor != null) {
+            petListPostProcessor.postProcessPetList(pets);
         }
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }

@@ -27,3 +27,7 @@ springboot-petclinic-server/
 
 # newman reports
 ./src/test/postman/reports/
+
+# JMeter
+results/
+jmeter.log
