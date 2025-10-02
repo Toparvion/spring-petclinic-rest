@@ -26,15 +26,16 @@ import java.util.List;
  * @author Vladimir Plizga
  */
 @Component
-@EnableScheduling           // to enable background risks recalculation
+@EnableScheduling           // to enable background metrics collection
 @ConditionalOnProperty("enable-specialty")
 public class MetricService {
     private static final Logger log = LoggerFactory.getLogger(MetricService.class);
 
-    private static final int BUFFERING_THRESHOLD = 89;
+    private static final int BUFFERING_THRESHOLD = Integer.getInteger("threshold", 89);
 
     private final List<ByteBuffer> rawMetrics = new ArrayList<>();
     private boolean bufferFull = false;
+    private boolean metricCollectionAllowed = false;
 
     private final MeterRegistry registry;
 
@@ -44,6 +45,9 @@ public class MetricService {
 
     @Scheduled(fixedDelay = 500, timeUnit = MILLISECONDS)
     public void collectMetrics() {
+        if (!metricCollectionAllowed) {
+            return;
+        }
         MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
         long memoryUsed = memoryUsage.getUsed();
         long memoryMax = memoryUsage.getMax();
@@ -58,7 +62,7 @@ public class MetricService {
         }
         else {
             if (!bufferFull) {
-                log.info("Metrics buffer is full with %d entries (memory used: %.2f%%)"
+                log.info("Metrics buffer is complete with %d entries (memory level: %.2f%%)"
                     .formatted(rawMetrics.size(), usedPercent));
             }
             bufferFull = true;
@@ -75,6 +79,7 @@ public class MetricService {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void registerMetrics() {
+        metricCollectionAllowed = true;
         // available as http://localhost:9966/petclinic/actuator/metrics/petclinic.metrics.count
         Gauge.builder("petclinic.metrics.count", rawMetrics::size)
             .baseUnit("pcs")

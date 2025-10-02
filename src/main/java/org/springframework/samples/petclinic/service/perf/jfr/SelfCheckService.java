@@ -1,5 +1,17 @@
 package org.springframework.samples.petclinic.service.perf.jfr;
 
+import static java.io.File.pathSeparator;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.function.Predicate.not;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,19 +27,6 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
-
-import static java.io.File.pathSeparator;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
-import static java.util.function.Predicate.not;
 
 /**
  *
@@ -62,7 +61,7 @@ public class SelfCheckService {
                 totalSize += byteArray.length;
                 outputStream.write(byteArray);
             }
-            log.debug("Self-check saved {} bytes to {}", totalSize, dumpPath);
+            log.trace("Self-check saved {} bytes to {}", totalSize, dumpPath);
         }
         catch (IOException e) {
             throw new RuntimeException("Failed to store self check dump", e);
