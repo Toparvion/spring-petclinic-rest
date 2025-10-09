@@ -29,5 +29,6 @@ springboot-petclinic-server/
 ./src/test/postman/reports/
 
 # JMeter
-results/
+/results/**
+!/results/.gitkeep
 jmeter.log
